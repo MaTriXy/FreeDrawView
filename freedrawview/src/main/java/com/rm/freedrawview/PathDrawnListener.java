@@ -6,5 +6,7 @@ package com.rm.freedrawview;
 
 public interface PathDrawnListener {
 
+    void onPathStart();
+
     void onNewPathDrawn();
 }

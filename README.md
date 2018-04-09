@@ -8,9 +8,8 @@ This View works flawlessly inside Scrolling parents like NestedScrollView. Be ca
 <img src="sample_rotation.gif" title="sample" /> <br />
 Also supports state-restore on rotation, with custom behaviours like "clear, crop or fitXY" and you can take a screenshot (given to you as a Bitmap Object) of the View drawn content<br />
 
-[Changelog] (CHANGELOG.md)<br />
+[Changelog](CHANGELOG.md)<br />
 
-<br />
 You can try the demo app on google play store. <br />
 coming soon <br /> <br />
 Or see the full video demo on YouTube. <br />
@@ -18,9 +17,9 @@ https://youtu.be/ejEdq4lnPjc <br /> <br />
 
 Download
 ------
-####Gradle:
+#### Gradle:
 ```groovy
-compile 'com.rm:freedrawview:1.0.0'
+compile 'com.rm:freedrawview:1.1.2'
 ```
 
 <br />
@@ -32,7 +31,7 @@ compile 'com.rm:freedrawview:1.0.0'
 To use this library, just add this inside your layout file
 
 ```xml
-    <com.rm.freedraw.FreeDrawView
+    <com.rm.freedrawview.FreeDrawView
                     android:id="@+id/your_id"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -87,7 +86,12 @@ public class MainActivity extends AppCompatActivity {
         mSignatureView.setOnPathDrawnListener(new PathDrawnListener() {
                     @Override
                     public void onNewPathDrawn() {
+                        // The user has finished drawing a path
+                    }
 
+                    @Override
+                    public void onPathStart() {
+                        // The user has started drawing a path
                     }
                 });
 
@@ -108,9 +112,23 @@ public class MainActivity extends AppCompatActivity {
 }
 ```
 
+#### Save and restore manually the Draw content
+From v1.1.0 you can get the current state of the Draw (as a Serializable object) and than restore it:
+```java
+        FreeDrawSerializableState state = mSignatureView.getCurrentViewStateAsSerializable();// This returns a FreeDrawSerializableState (which implements Serializable)
+
+        // Save this "state" object into a file or keep it where you want
+
+        mSignatureView.restoreStateFromSerializable(state);// Restore the state of the view
+
+        // Now all the previous paths and points have been restored (including the history)
+```
+
+To save this Serializable Object inside a file you can take a look at the class [FileHelper](app/src/main/java/com/rm/freedrawsample/FileHelper.java)
+
 <br />
 
-####Supported Attributes
+#### Supported Attributes
 FreeDrawView
 ------
 | XML Attribute                 | Java method                                                     	| Description                                                                                                     	| Default value                                      	                                        |
@@ -123,8 +141,11 @@ FreeDrawView
 
 <br />
 
-####Limitations and TODO
-* Multitouch drawing is not supported <br />
+#### Limitations and TODO
+* Multitouch drawing is currently not supported <br />
+* Eraser is not yet implemented <br />
+* ~~Manually restore state is not supported~~ <br />
+* Get the draw screenshot from a FreeDrawSerializableState without adding the view
 
 <br />
 
@@ -134,18 +155,36 @@ Also, the FreeDrawView class gives some utility methods to handle path history: 
 * ```public void redoLast()``` <br />
     This method redraw the last undone segment  <br /> <br />
 * ```public void undoAll()``` <br />
-    This method undo all the drawn segments, can be redone one by one or all in one <br /> <br />
+    This method undo all the drawn segments, they can be redone one by one or all in one <br /> <br />
 * ```public void redoAll()``` <br />
     This method redraw all the undone segments <br /> <br />
+* ```public void clearHistory()``` <br />
+    This method removes all the history segments (The one that could be redone) <br /> <br />
+* ```public void clearDraw()``` <br />
+    This method removes all the current drawn segments, without adding them to the history <br /> <br />
+* ```public void clearDrawAndHistory()``` <br />
+    This method removes all the current drawn segments and clears the history <br /> <br />
+* ```public int getPathCount(boolean includeCurrentlyDrawingPath)``` <br />
+    This method returns the current number of segments drawn <br /> <br />
+
 
 <br />
-You can set a PathDrawnListener to be notified every time a new path is drawn or a PathRedoUndoCountChangeListener to be notified when the undo or redo count changes. <br />
+
+You can use: <br/>
+* ```setOnPathDrawnListener(PathDrawnListener listener)``` <br />
+to be notified every time the user starts or finishes drawing a line. <br /> <br />
+* ```setPathRedoUndoCountChangeListener(PathRedoUndoCountChangeListener listener)``` <br />
+to be notified when the undo or redo count changes. <br /> <br />
+
+And remove them with: <br/>
+* ```removePathDrawnListener()``` <br />
+* ```removePathRedoUndoCountChangeListener()``` <br />
 <br />
 
 License
 --------
 
-    Copyright 2016 Riccardo Moro.
+    Copyright 2017 Riccardo Moro.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
